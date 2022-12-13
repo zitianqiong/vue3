@@ -12,6 +12,7 @@ export const postJson = (url, params) =>{
 //传送json格式的get请求
 export const get = (url,params) =>{
     return instance({
+        method: 'get',
         url:url,
         params:params,
     })

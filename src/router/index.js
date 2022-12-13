@@ -6,13 +6,14 @@ import {
 } from 'vue-router'
 import home from '../views/home.vue'
 import AppLayout from '../layout/AppLayout.vue'
-import NotFound from '~/views/404.vue'
+import NotFound from '../views/404.vue'
 import {get} from "../api/index.js";
+import store from "../store/index.js";
 
 const routes = [
     {
         path: '/',
-        name:"AppLayout",
+        name: "主页",
         component: AppLayout,
         redirect: '/home',
         children:[
@@ -20,26 +21,52 @@ const routes = [
                 path: 'home',
                 name: 'home',
                 component: home,
+                meta: {
+                    breadNumber: 2
+                }
             },
             {
                 path: '/main',
-                name: 'main',
-                component: () => import('~/views/main/index.vue'),
+                name: '主页',
+                component: () => import('../views/main/index.vue'),
+                meta: {
+                    breadNumber: 2
+                }
             },
             {
                 path: '/minecraft',
                 name: 'mc',
-                component: () => import('~/views/minecraft/index.vue'),
+                component: () => import('../views/minecraft/index.vue'),
+                meta: {
+                    breadNumber: 2
+                }
             },
             {
                 path: '/doc',
-                name: 'doc',
-                component: () => import('~/views/document/index.vue'),
+                name: '文档',
+                component: () => import('../views/document/index.vue'),
+                meta: {
+                    requireAuth: true,
+                    breadNumber: 2
+                }
             },
             {
                 path: '/setting',
-                name: 'setting',
-                component: () => import('~/views/setting/index.vue'),
+                name: '设置',
+                component: () => import('../views/setting/index.vue'),
+                meta: {
+                    requireAuth: true,
+                    breadNumber: 2
+                }
+            },
+            {
+                path: '/sidebar',
+                name: 'sidebar',
+                component: () => import('../components/sidebar.vue'),
+                meta: {
+                    requireAuth: true,
+                    breadNumber: 2
+                }
             },
             {
                 path: '/:pathMatch(.*)*',    // 捕获所有路由或 404 Not found 路由
@@ -66,27 +93,26 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.path === '/login') next();
-    if (window.sessionStorage.getItem("tokenStr")) {
+    if (sessionStorage.getItem("tokenStr") || localStorage.getItem("tokenStr") || store.state.tokenStr) {
         // initMenu(router, store);
-        if (!window.sessionStorage.getItem("user")) {
+        if (!sessionStorage.getItem("user")) {
             return get('/user/info').then(resp => {
                 if (resp) {
                     //存入用户信息
-                    window.sessionStorage.setItem("user", JSON.stringify(resp));
+                    sessionStorage.setItem("user", JSON.stringify(resp));
+                    store.commit("setUserInfo", resp.data)
                     next();
                 }
             });
         }
         next();
     } else {
-        if (to.path === '/') {
-            next('/login');
-        }
-        else {
+        if (!to.meta.requireAuth) {
+            next();
+        } else {
             next('/login');
         }
     }
 })
-
 
 export default router

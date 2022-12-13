@@ -6,6 +6,7 @@
             :unique-opened="true"
             default-active="1" router
             text-color="#fff"
+            style="height: 100%;"
             :collapse="isCollapse" :collapse-transition="false">
         <el-sub-menu index="1">
             <template #title>

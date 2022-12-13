@@ -19,7 +19,7 @@
       </el-form-item>
       <el-checkbox v-model="checked" class="loginRemember">记住我</el-checkbox>
       <el-form-item>
-        <el-button round style="width: 100%" type="primary" @click="submitLogin">登录</el-button>
+        <el-button round style="width: 100%" type="primary" @click="submitLogin" :loading="loading">登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -29,6 +29,7 @@
   import { reactive, ref } from 'vue'
   import {postJson} from "../api";
   import router from "../router"
+  import store from "../store"
 
   let loginForm = reactive({
     username: 'q',
@@ -55,20 +56,27 @@
             loading = false;
             //保存用户token
             const tokenStr = resp.data.tokenHead + resp.data.token;
-            window.sessionStorage.setItem('tokenStr',tokenStr);
+            sessionStorage.setItem('tokenStr',tokenStr);
+            let userInfo ={
+              isLogin: true,
+              name: resp.data.username,
+              age: resp.data.age,
+            };
+            store.commit("setUserInfo", userInfo);
+            store.commit("setToken", tokenStr);
             //跳转首页
             //replace 即替换当前页面，无法后退，
             //push 可以后退
             router.replace('/');
           }else {
             loading = false;
-            console.log(resp.msg)
+            updateCaptcha();
           }
         })
       } else {
         //提示错误信息
         loading = false;
-        console.log('error submit!', fields)
+        updateCaptcha();
         return false;
       }
     })

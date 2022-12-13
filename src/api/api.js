@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from "../router/index.js";
+import store from "../store/index.js";
 
 // 配置axios的属性
 export const instance = axios.create({
@@ -12,8 +13,12 @@ export const instance = axios.create({
 
 instance.interceptors.request.use(config=>{
     //如果存在token，请求将携带这个token
-    if(window.sessionStorage.getItem('tokenStr')){
-        config.headers['Authorization'] = window.sessionStorage.getItem('tokenStr');
+    if (store.state.tokenStr){
+        config.headers['Authorization'] = store.state.tokenStr;
+    }else if(window.sessionStorage.getItem('tokenStr')){
+        config.headers['Authorization'] = sessionStorage.getItem('tokenStr');
+    } else {
+        router.push("/login")
     }
     return config;
 },error=>{
@@ -26,7 +31,7 @@ instance.interceptors.response.use(success=>{
     if (success.status && success.status === 200){
         if (success.data.code === 500||success.data.code === 401||success.data.code === 403){
             ElMessage.error({message:success.data.msg})
-            return;
+            return success.data;
         }
         // if (success.data.msg){
         //     ElMessage.success({message:success.data.msg});

@@ -23,7 +23,7 @@ export default defineConfig({
   // 识别 @ 符号为"./src"目录开始
   resolve: {
     alias: {
-      "@": path.resolve("."),
+      "@": path.resolve("./src"),
       "~": path.resolve("src"),
     },
   },

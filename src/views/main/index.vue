@@ -1,10 +1,10 @@
 <template>
-    这是主页
+  这是主页
 </template>
 
 <script>
 export default {
-    name: "index"
+  name: "index"
 }
 </script>
 

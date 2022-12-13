@@ -1,10 +1,10 @@
 <template>
-    这是文档页
+  这是文档页
 </template>
 
 <script>
 export default {
-    name: "index"
+  name: "index"
 }
 </script>
 
